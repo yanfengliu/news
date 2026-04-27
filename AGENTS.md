@@ -77,14 +77,15 @@ This section is the operational implementation of the Core-rules "Multi-CLI code
 - **Diff reviews take ~5 minutes per CLI on a multi-hundred-line diff.** Run them in parallel with `run_in_background: true`. Wait via a single background `until` poller (`until [ -s codex.txt ] && [ -s claude.txt ] && [ -s gemini.txt ]; do sleep 8; done`) so the harness's no-long-sleeps guard doesn't fire and you don't poll repeatedly.
 - **If a CLI is unreachable** (quota exhaustion, model name rejected by harness), proceed with the remaining reviewers and note the unreachable CLI in the devlog. Two converging reviews are still useful signal — do not block the workflow on a third.
 
-## Git (project-specific: trunk-based)
+## Git
 
-- This project uses **trunk-based development**: do not use worktrees or branches. Commit directly to `main`.
+- **Commit directly to `main`.** This is a solo-developer project; branches add overhead without payoff and block autonomous progress while waiting for merge authorization. Each coherent change lands as its own commit on `main`. The full suite (`npm test`, `npx tsc --noEmit`, `npm run build`) must pass before each commit.
 - Use the `git -C <path> <command>` syntax for all git operations (see Command Execution Rules).
 - When you iterate, only run affected tests.
-- After confidence in the change, run the full suite to make sure you didn't accidentally break anything.
-- Commit durable docs you added if you are not planning to remove them.
+- After confidence in the change, run the full suite to make sure you didn't accidentally break anything before committing.
 - Commit as soon as you have a coherent, self-contained unit of change.
+- Commit durable docs you added if you are not planning to remove them.
+- **No branches needed for normal work.** Branches are reserved for explicit experimentation that you intend to keep isolated from `main` (and even then, prefer revertable single-commit experiments on `main`). The earlier `agent/<task>` branch convention and the merge-authorization gate are removed — they were artifacts of a multi-developer workflow that doesn't apply here.
 
 ## Documentation
 
